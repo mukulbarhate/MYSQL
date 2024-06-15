@@ -1,0 +1,179 @@
+call sp_loademp(1000000);
+
+ show indexes from emp;
+
+select  * from emp where eid=12123;
+
+explain
+select  * from emp where eid=12123;
+
+create index emp_eid_idx
+on emp(eid);
+
+call sp_loademp(100);
+
+select eid,ename,deptname,salary,
+(select sum(salary) from emp i
+where i.salary>o.salary or(i.salary=o.salary 
+and i.eid<=o.eid)) running_salary_total
+from
+ emp o join dept
+on o.deptid=dept.deptid
+order by salary desc,eid;
+
+
+
+select salary,count(*) from emp group by salary having count(*) >1;
+
+
+insert into emp values(101,'a101',98300,1);
+
+
+
+select deptname,eid,ename,salary,
+sum(salary) over(order by salary desc
+rows between unbounded preceding and current row) running_salary_total
+from
+ emp o join dept
+on o.deptid=dept.deptid limit 5
+;
+
+
+-- 
+Unbounded Preceding
+1 preceding
+2 preceding
+...
+n preceding
+
+
+
+Unbounded Following
+1 Following
+2 Following
+...
+n Following
+
+Current Row
+
+
+select * from emp where salary between 1300 and 500;
+
+
+select deptname,eid,ename,salary,
+sum(salary) over(order by salary desc
+rows between 1 following and  1 following) Next_High_Salary
+from
+ emp o join dept
+on o.deptid=dept.deptid 
+;
+
+
+
+select eid,ename,deptname,salary,
+(select max(salary) from emp i
+where i.salary<o.salary or(i.salary=o.salary 
+and i.eid>o.eid)) next_hight_salary
+from
+ emp o join dept
+on o.deptid=dept.deptid
+order by salary desc,eid;
+
+
+
+
+select deptname,eid,ename,salary,
+sum(salary) over(order by salary desc
+rows between 1 preceding and  1 preceding) Prev_High_Salary
+from
+ emp o join dept
+on o.deptid=dept.deptid 
+;
+
+
+select deptname,eid,ename,salary,
+lag(salary,1,0) over(order by salary desc) Prev_High_Salary
+from
+ emp o join dept
+on o.deptid=dept.deptid limit 5
+;
+
+
+
+select deptname,eid,ename,salary,
+lead(salary,1) over(order by salary desc) Prev_High_Salary
+from
+ emp o join dept
+on o.deptid=dept.deptid limit 5
+;
+
+
+-- With Queries also called as CTE- Common Table Expressions
+
+
+with recursive tab
+as(select 1 id
+union all
+select id+1 from tab
+where id<100)
+select * from tab;
+
+set @@cte_max_recursion_depth=10000000;
+
+
+with recursive tab
+as(select 1 as eid, convert('a1',char(100)) as ename,13232 salary,1 as deptid
+union all
+select eid+1,concat(convert(char(mod(eid,26)+97),char(1)),eid+1),rand()*10000,mod(eid,3)+1 from tab where eid<100
+) 
+select * from tab;
+
+drop table parts;
+create table parts(partid varchar(10), parentid varchar(10));
+
+insert into parts values('A','A');
+insert into parts values('B','B');
+insert into parts values('C','C');
+insert into parts values('D','B');
+insert into parts values('E','D');
+insert into parts values('F','E');
+insert into parts values('G','C');
+insert into parts values('H','G');
+insert into parts values('I','H');
+insert into parts values('J','H');
+insert into parts values('K','C');
+insert into parts values('L','K');
+insert into parts values('M','L');
+
+
+
+
+
+
+with recursive tab
+as
+(select partid, parentid immediateparent, parentid topmostparent,0 level from parts
+union all
+select
+t.partid,immediateparent,p.parentid,level+1
+from tab t join parts p
+on t.topmostparent=p.partid
+where p.partid!=p.parentid)
+select partid,topmostparent from (select *,row_number() over(partition by partid order by level desc) rn from tab) tab2 ;
+
+
+with recursive tab
+as
+(select partid, parentid immediateparent, parentid topmostparent,0 level from parts
+union all
+select
+t.partid,immediateparent,p.parentid,level+1
+from tab t join parts p
+on t.topmostparent=p.partid
+where p.partid!=p.parentid)
+select * from (select *,row_number() over(partition by partid order by level desc) rn from tab) tab2 where topmostparent='C' 
+order by level;
+
+Mongodb
+
+db.test_coll.insert({name: "john" , age: 33});

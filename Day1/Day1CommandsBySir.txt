@@ -1,0 +1,438 @@
+mysql -uroot -ptest@123
+
+show databases;
+select version();
+
+select database();
+
+use mysql;
+
+create database vita2024;
+
+
+use vita2024;
+
+show tables;
+
+create table t1(c1 int, c2 varchar(100), c3 date);
+
+select current_date();
+
+desc t1;
+
+
+select * from t1;
+
+
+
+insert into t1(c1,c2,c3)
+values(1,'a','2024-01-21');
+
+
+
+insert into t1(c1,c2,c3)
+values
+(3,'c','2024-03-20'),
+(4,'d','2024-04-20'),
+(5,'e','2024-05-20')
+;
+
+
+insert into t1(c1,c2,c3)
+values(6,'f',current_date());
+
+
+
+insert into t1
+values(7,'ag','2024-01-21');
+
+
+insert into t1(c1,c2)
+values(8,'y');
+
+
+
+
+select * from t1;
+
+
+
+
+
+select * from t1 where c1=1;
+
+select * from t1 where c1!=1;
+
+select * from t1 where c1<>1;
+
+
+
+select * from t1 where c1 in (1,5,6);
+
+
+
+select * from t1 where c1=1 or c1=5 or c1=6;
+
+
+select * from t1 where c1 not in (1,5,6);
+
+select * from t1 where c1 between 2 and 5;
+
+
+select * from t1 where c1 not between 2 and 5;
+
+select * from t1 where c3 is null;
+
+
+select * from t1 where c3 is not null;
+
+select * from t1 where c3 =current_date();
+
+
+select * from t1 where c3 !=current_date();
+
+
+
+update t1 set c2='x',c3='2023-01-01' where c1=1;
+
+
+delete from t1 where c1=1;
+
+
+
+alter table t1 add c4 int;
+alter table t1 drop column c4;
+
+alter table t1 modify column c2 varchar(200);
+
+alter table t1 modify column c2 varchar(200) not null;
+
+alter table t1 rename to t2;
+alter table t2 rename to t1;
+
+alter table t1 modify column c3 date default '2024-01-01';
+
+alter table t1 modify column c3 date default current_date();-- gives error
+
+
+insert into t1 (c1,c2) values(
+10,'a');
+
+insert into t1 (c1,c2) values(
+10,null); -- gives error as null is not allowed in c2
+
+alter table t1 rename column c1 to c5;
+
+
+
+create table t1_uk(c1 int unique, c2 varchar(100));
+
+insert into t1_uk values(1,'a') ; -- works
+
+insert into t1_uk values(1,'b') ; -- fails
+
+insert into t1_uk values(null,'b') ; -- works
+
+insert into t1_uk values(null,'b') ; -- works
+
+create table t1_uk_comp(c1 int, c2 int, c3 varchar(100),
+unique(c1,c2));
+
+insert into t1_uk_comp values(1,1,'a');
+insert into t1_uk_comp values(1,2,'a');
+insert into t1_uk_comp values(2,2,'a');
+insert into t1_uk_comp values(2,2,'b'); -- fails
+
+
+
+create table t1_pk(c1 int primary key, c2 varchar(100));
+
+
+insert into t1_pk values(1,'a'); -- works
+insert into t1_pk values(1,'b'); -- fails
+insert into t1_pk values(null,'b'); -- fails
+
+
+create table t1_pk_multi(c1 int primary key , c2 int primary key); -- fails
+
+
+
+
+
+
+create table t1_pk_multi(c1 int , c2 int , c3 varchar(100), primary key(c1,c2)); -- works
+
+
+alter table t1_pk_multi add constraint t1_uk_multi unique(c2);
+
+
+create table t1_diff(c1 int, c2 date, c3 varchar(100), 
+unique(c1,c2,c3));
+
+
+use information_schema;
+
+
+show tables like '%cons%';
+
+desc TABLE_CONSTRAINTS;
+
+select * from table_constraints where table_schema='vita2024' and table_name='t1_diff';
+
+show create table t1_diff;
+
+
+select column_name,column_key from information_schema.columns
+where table_schema='vita2024' and table_name='t1_diff';
+
+
+create table t1_nn(c1 int , c2 int not null);
+
+insert into t1_nn values(1,null); -- fails
+
+insert into t1_nn values(1,null),(2,1);
+
+
+create table t_check (eid int, ename varchar(100), salary int check(salary>=2000));
+
+
+insert into t_check values(1,'a',100); -- fails
+
+insert into t_check values(1,'a',null); -- works
+
+insert into t_check values(1,'a',2000); --
+
+
+
+create table t_parent(deptid int primary key , deptname varchar(100));
+create table t_child(eid int, ename varchar(100), deptid int,
+foreign key (deptid) references t_parent(deptid));
+
+
+
+insert into t_child values(1,'a',4); -- fails
+
+insert into t_parent values(4,'HR');
+
+insert into t_child values(1,'a',4); -- works
+
+insert into t_child values(1,'a',null); -- works
+
+
+create table t_default(id int, salary int default 1000);
+
+
+insert into t_default(id) values(1);
+
+
+insert into t_default(id,salary) values(1,null);
+
+select * from t_check;
+start transaction;
+update t_check set salary=3000;
+rollback; 
+
+start transaction;
+update t_check set salary=3000;
+commit;
+
+
+select count(*) from t1;
+
+
+select count(c3) from t1;
+
+select count(c5) from t1;
+
+select count(*),count(1),count(c3),count(c5) from t1;
+
+
+select sum(c5) from t1;
+
+select avg(c5) from t1;
+select max(c5) from t1;
+select min(c5) from t1;
+
+
+drop table t1;
+create table t1 (c1 int, c2 varchar(10));
+create table t2 (c1 int, c3 varchar(10));
+
+
+insert into t1 values(1,'a'),(2,'b'),(3,'c');
+insert into t2 values(3,'x'),(4,'y'),(5,'z');
+
+
+-- cross join
+-- new/ANSI standard syntax
+
+select * from t1 cross join t2;
+
+select t1.c1,c2,c3 from t1 cross join t2;
+
+-- old syntax
+
+
+
+-- Inner join
+-- new/ANSI standard syntax
+
+select * from t1 inner join t2
+on t1.c1=t2.c1;
+
+select * from t1 join t2
+on t1.c1=t2.c1;
+
+
+
+-- old syntax
+
+
+select * from t1 , t2
+where t1.c1=t2.c1;
+
+
+
+-- Left join
+-- new/ANSI standard syntax
+
+select * from t1 Left join t2
+on t1.c1=t2.c1;
+
+
+
+-- right join
+-- new/ANSI standard syntax
+
+select * from t1 right join t2
+on t1.c1=t2.c1;
+
+
+--not supported in mysql, we will see the workaround later
+
+select * from t1 full join t2
+on t1.c1=t2.c1;
+
+
+
+create table a(id int);
+create table b(id int);
+
+insert into a values(1),(2),(3);
+insert into b values(3),(4),(5);
+
+
+select * from a
+union
+select * from b;
+
+
+select * from b
+union
+select * from a;
+
+
+
+select * from a
+union all
+select * from b;
+
+
+select * from b
+union all
+select * from a;
+
+
+
+select * from a
+intersect 
+select * from b;
+
+
+select * from b
+intersect 
+select * from a;
+
+
+
+select * from a
+except
+select * from b;
+
+
+select * from b
+except
+select * from a;
+
+
+-- full join workaround
+
+select * from t1 left join t2
+on t1.c1=t2.c1
+union
+select * from t1 right join t2
+on t1.c1=t2.c1;
+
+
+
+
+  create table dept ( deptid int primary key , deptname varchar(10));
+
+
+  create table emp ( eid int  , ename varchar(20) , salary int , deptid int references dept(deptid));
+
+
+
+  insert into dept values (1 , 'HR');
+  insert into dept values (2, 'IT');
+  insert into dept values (3, 'Finance'); 
+insert into dept values(4,'OPR');
+
+   insert into emp values (1,'a',1000,1);
+   insert into emp values (2,'b' , 1023 , 2);
+   insert into emp values (3,'c' , 23 , 3);
+   insert into emp values (4,'d' , 123 , 3);
+   insert into emp values (5,'e' , 102 , 1);
+   insert into emp values (6,'f' , 2023 , 3);
+   insert into emp values (7,'g' , 323 , 1);
+   insert into emp values (8,'h' , 523 , 2);
+   insert into emp values (9,'i' , 136 , 1);
+   insert into emp values (10,'j', 627 , 1);
+   insert into emp values (11,'k' , 978 , 3);
+   insert into emp values (12,'l' , 222 , 1);
+   insert into emp values (13,'m' , 746 , 1);
+   insert into emp values (14,'n' , 3223 , 1);
+   insert into emp values (15,'o' , 1999 , 3);
+   insert into emp values (16,'p' , 821 , 3);
+   insert into emp values (17,'q' , 324 , 1);
+   insert into emp values (18,'r' , 546 , 3);
+   insert into emp values (19,'s' , 717 , 2);
+   insert into emp values (20,'t' , 817 , 2);
+   insert into emp values (21,'u' , 888 , 3);
+   insert into emp values (22,'v' , 9029 , 1);
+   insert into emp values (23,'w' , 20001 , 3);
+   insert into emp values (24,'x' , 28222 , 1);
+   insert into emp values (25,'y' , 19212 , 3);
+   insert into emp values (26,'z' , 12111 , 1);
+   insert into emp values (27,'a1' , 3211 , 1);
+   insert into emp values (28,'a2' , 9238 , 1);
+   insert into emp values (29,'a3' , 653 , 3);
+   insert into emp values (30,'a4' , 44 , 1);
+   insert into emp values (31,'a5' , 3 , 2);
+   insert into emp values (32,'a6' , 16 , 1);
+   insert into emp values (33,'a7' , 14 , 2);
+   insert into emp values (34,'a8' , 845 , 1);
+   insert into emp values (35,'a9' , 135 , 3);
+   insert into emp values (36,'b1' , 1212 , 1);
+   insert into emp values (37,'b2' , 1242 , 2);
+   insert into emp values (38,'b3' , 4212 , 2);
+   insert into emp values (39,'b4' , 4444 , 3);
+   insert into emp values (40,'b5' , 555 , 1);
+   insert into emp values (41,'b6' , 1553 , 3);
+   insert into emp values (42,'b7' , 6432 , 1);
+   insert into emp values (43,'b8' , 4532 , 2);
+   insert into emp values (44,'b9' , 3355 , 1);
+   insert into emp values (45,'c1' , 2324 , 2);
+
+
+

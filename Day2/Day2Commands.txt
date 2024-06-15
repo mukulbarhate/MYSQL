@@ -1,0 +1,300 @@
+mysql -uroot -ptest@123 -D vita2024
+
+
+
+Queries:
+
+1. Display the name of all employees whose salary is between 500 and 1300
+
+select ename,salary from emp where salary between 500 and 1300;
+select ename,salary from emp where salary >= 500 and  salary <= 1300;
+
+2. Display the name of all employees who are in HR dept
+-- sub query
+select ename,'HR' as deptname  from emp where deptid=(select deptid from dept where
+deptname='HR');
+
+-- Join
+
+select ename,deptname from emp join dept on emp.deptid=dept.deptid
+where deptname='HR';
+
+3. Display the name of all the dept and count of all the employees in that dept.
+
+select deptname,count(eid)  emp_cnt
+from
+emp right join dept
+on emp.deptid=dept.deptid
+group by deptname;
+
+
+4. Display the name , deptname and  salary of the employee whose salary is highest.
+
+select ename,deptname,salary
+from
+emp join dept
+on emp.deptid=dept.deptid
+order by salary desc limit 1;
+
+5. Display the name , deptname and  salary of the employee whose salary is lowest.
+
+
+select ename,deptname,salary
+from
+emp join dept
+on emp.deptid=dept.deptid
+order by salary limit 1;
+
+
+6. Display the name , deptname of employee whose salary is second highest.
+
+
+-- in this the first parameter is offset and 2nd parameter is limit clause
+
+select ename,deptname,salary
+from
+emp join dept
+on emp.deptid=dept.deptid
+order by salary desc limit 1,1;
+
+select ename,deptname,salary
+from
+emp join dept
+on emp.deptid=dept.deptid
+order by salary desc limit 1 offset 1;
+
+
+
+7. display the name, deptname of top five earning employees.
+select ename,deptname,salary
+from
+emp join dept
+on emp.deptid=dept.deptid
+order by salary desc limit 5; 
+
+8. Display the deptname, name of top 5 earning employees from each dept.
+-- will do later
+
+9. Display the avg salary of each dept.
+
+select deptname,avg(salary) dept_avg_sal
+from
+emp right join dept
+on emp.deptid=dept.deptid
+group by deptname;
+
+10.Display the min and max salary of each dept.
+
+select deptname,min(salary) dept_min_sal
+,max(salary) dept_max_sal
+from
+emp right join dept
+on emp.deptid=dept.deptid
+group by deptname;
+
+
+
+
+create table emp_rank(eid int,ename varchar(10),salary int,
+deptid int);
+
+
+insert into emp_rank values(1,'a',100,1);
+insert into emp_rank values(2,'b',200,2);
+insert into emp_rank values(3,'c',100,1);
+insert into emp_rank values(4,'d',200,2);
+insert into emp_rank values(5,'e',50,1);
+insert into emp_rank values(6,'f',60,2);
+insert into emp_rank values(7,'g',70,1);
+
+
+
+select * , row_number() over(order by salary desc) rn
+, rank() over(order by salary desc) rnk
+, dense_rank() over(order by salary desc) drnk
+from emp_rank;
+
+
+select * , row_number() over(partition by deptid order by salary desc) rn
+, rank() over(partition by deptid order by salary desc) rnk
+, dense_rank() over(partition by deptid order by salary desc) drnk
+from emp_rank;
+
+
+8. Display the deptname, name of top 5 earning employees from each dept.
+
+
+select * from (
+select deptname,ename,salary,
+row_number() over(partition by deptname order by salary desc) rn
+from emp join dept 
+on emp.deptid=dept.deptid) as t where rn<=5;
+
+
+create table emp_mgr(eid int,ename varchar(10),mgrid int);
+insert into emp_mgr values(1,'a',4);
+insert into emp_mgr values(2,'b',4);
+insert into emp_mgr values(3,'c',4);
+insert into emp_mgr values(4,'d',4);
+insert into emp_mgr values(5,'e',6);
+insert into emp_mgr values(6,'f',6);
+insert into emp_mgr values(7,'g',6);
+
+
+
+select e.mgrid,m.ename mgrname,e.eid,e.ename from emp_mgr e,
+emp_mgr m
+where 
+e.mgrid=m.eid and
+e.mgrid<>e.eid;
+
+
+
+select ename,salary,
+case 
+when salary>=1500 then 'Very High'
+when salary>=1000 then 'High'
+when salary>=500 then 'Avg'
+else 'Low' 
+end as Salary_Band
+from emp;
+
+
+create table marks (roll int, sub varchar(10), marks int);
+insert into marks values(1,'M',97);
+insert into marks values(1,'E',98);
+insert into marks values(1,'H',99);
+insert into marks values(2,'M',92);
+insert into marks values(2,'E',93);
+insert into marks values(2,'H',20);
+insert into marks values(3,'M',36);
+insert into marks values(3,'E',37);
+insert into marks values(3,'H',38);
+
+
+
+select roll,
+case when  min(marks)>=35 and avg(marks)>=40  then 'Pass'
+else 'Fail' end 
+Result
+ from marks
+group by roll;
+
+
+
+
+
+select deptname from dept
+where exists
+(select 1 from emp where emp.deptid=dept.deptid);
+
+
+
+select deptname from dept
+where not exists
+(select 1 from emp where emp.deptid=dept.deptid);
+
+
+
+select deptname,count(eid) from dept d left join emp e
+on d.deptid=e.deptid
+group by deptname
+having count(eid)>=15;
+
+
+
+select deptname from dept 
+where exists(
+select 1 from emp
+where emp.deptid=dept.deptid
+having  count(eid)>=15);
+
+
+
+create table account(accno int primary key auto_increment,
+accname varchar(10));
+
+
+insert into account(accname) values('a'),('b'),('c');
+
+alter table account auto_increment=10000;
+
+
+
+delete from account;
+
+truncate table account;
+
+start transaction;
+delete from account;
+rollback;
+
+
+start transaction;
+truncate table account;
+rollback;
+
+
+
+start transaction;
+update emp set salary=2000 where eid=1;
+
+
+show variables like 'datadir';
+
+
+create view vw_emp_dept
+as
+select ename,deptname,salary
+from emp e join dept d
+on e.deptid=d.deptid;
+
+
+select * from vw_emp_dept;
+
+
+explain select * from vw_emp_dept;
+
+-- write a query to display name of all employees along with their
+salary and deptname
+whose salary is greater than avg salary of HR dept;
+
+
+
+select ename,salary,deptname
+from emp join dept
+on emp.deptid=dept.deptid
+where salary>
+(select avg(salary) from emp join dept
+on emp.deptid=dept.deptid
+where deptname='HR'
+);
+
+
+select deptname,avg(salary) from emp join dept
+on emp.deptid=dept.deptid
+group by deptname;
+ write a query to display name of all employees along with their
+salary and deptname
+whose salary is greater than avg salary of their dept;
+
+
+select ename,salary,deptname
+from emp e join dept d
+on e.deptid=d.deptid
+where exists
+(select 1 from emp e2 join dept d2
+on e2.deptid=d2.deptid
+where d.deptname=d2.deptname
+group by d2.deptname
+having avg(e2.salary)<=e.salary
+);
+
+
+select ename,salary,deptname
+from emp e join dept d
+on e.deptid=d.deptid
+where exists
+(select 1 from emp e2
+where e.deptid=e2.deptid
+having avg(e2.salary)<=e.salary);

@@ -1,0 +1,246 @@
+					Day2
+
+------------------ Analytical Function - Ranking Function -------------
+
+
+
+----------------- PARTITION BY CLAUSES ---------------------------
+
+
+----------------- Inline view ---------------------------
+
+create table emp_mgr(eid int, ename varchar(100), mgrid int);
+ 
+
+insert into emp_mgr values(1,'a', 4),(2,'b', 4), (3,'c', 4),(4,'d',4),(5,'e', 6),(6,'f',6),(7,'g',6);
+
+-------------- select * (select mgrid, mgrname, eid, ename from emp_mgr join emp_mgr on mgrid=mgrid group by mgrid) as t;-----------------------
+ 
+select e.mgrid, e.eid,e.ename from emp_mgr e
+where e.mgrid<>e.eid;
+
+select e.mgrid, e.eid, m.ename mgrname, e.ename from emp_mgr e,
+emp_mgr m
+where 
+e.mgrid=m.eid and
+e.mgrid<>e.eid ;
+
+------------ CASE STATEMENT --------------------------
+
+select ename, salary,
+case
+when salary >= 1500 then 'Very High'
+when salary >= 1000 then 'High'
+when salary >= 500 then 'Avg'
+else 'Low'
+end as Salary_Band
+from emp;
+
+
+---------------- SCENARIO---------------------
+
+create table marks(Roll int, Sub varchar(100), Marks int);
+
+insert into marks values (1, 'm', 97),
+(1, 'e', 98),
+(1, 'h', 99),
+(2, 'm', 92),
+(2, 'e', 93),
+(2, 'h', 20),
+(3, 'm', 36),
+(3, 'e', 37),
+(3, 'h', 38);
+
+---------------select roll,
+case
+when marks >= 35 and (select marks where roll=1)
+end as result
+from marks;-----------------------------
+
+select roll,
+from marks
+group by roll;
+
+select roll,
+case when min(marks)>=35 and avg(marks)>=40 then 'Pass'
+else 'Fail'end
+Result
+from marks
+group by roll;
+
+
+-------------------------- CORRELATED SUBQUERY -----------------
+
+
+
+-------------------------- EXISTS AND NOT EXISTS -------------------
+
+select deptname from dept
+where exists
+(select 1 from emp where emp.deptid=dept.deptid);
+
+select deptname from dept
+where not exists
+(select 1 from emp where emp.deptid=dept.deptid);
+
+
+------------------ display department where atleast 15 employes working in it
+
+select deptname, count(eid) from dept d left join emp e
+on d.deptid=e.deptid
+group by deptname
+having count(eid)>=15;
+
+select deptname from dept d left join emp e
+on d.deptid=e.deptid
+group by deptname
+having count(eid)>=15;
+
+select deptname from dept
+where exists(
+select * from emp
+where emp.deptid=dept.deptid
+having count(eid)>=15);			-- we cannot use * when we are using having 
+
+------------------- AUTOINCREMENT COLUMN ----------------------	
+
+create table account(accno int primary key auto_increment, -- it can be added to only one column
+accname varchar(10));
+
+insert into account(accname) values('a'), ('b'),('c');
+
+alter table account auto_increment=1000;	--it always increment the value even if the table is deleted
+
+delete from account;
+
+truncate table account;
+
+start transaction 
+delete from account;
+rollback;
+
+start transaction;
+truncate table account;
+rollback;
+
+
+
+
+-- truncate reset the values to 1
+
+-- truncate is faster than delete
+
+************************* INTERVIEW QUESTION Truncate VS DELETE **************************
+
+------------------------- TRANSACTION --------------------
+
+------------- WAL- WRITE AHEAD LOGIN----------------
+
+
+------------ ISOLATION -------------
+
+start transaction;
+update emp set salary=2000 where eid=1;
+
+show variables like 'datadir';
+
+--------------- VIEWS -----------------
+
+create view vm_emp_dept
+as 
+select ename, deptname, salary
+from emp e join dept d
+on e.deptid = d.deptid;
+
+select * from vm_emp_dept;
+
+explain select * from vm_emp_dept;
+
+
+query plan of hte table explain cammand is used;
+
+-- write a query to display name of all employees along with their salary and deptname
+whose salary is greater than avg salary of HR dept;
+
+------------------------------------------------------------------------------
+I tried this
+select e.ename, e.salary, e.deptname 
+from emp e
+join dept d
+on 
+e.deptid=d.deptid
+group by salary
+where avg(salary)>=1000;
+
+select e.ename, e.salary, d.deptname from emp e
+left join dept d on e.deptid=d.deptid
+where e.salary>1000;
+
+
+select deptname, ename, salary from emp
+join dept on emp.dept=dept.deptid where deptname='HR';
+
+select e.ename, e.salary, d.deptname from emp e
+left join dept d on e.deptid=d.deptid
+where (select * from emp where ename='a');
+
+(select 1 from emp
+join dept on e.deptid=d.deptid where deptname='HR')
+
+(select 1 from emp where emp.deptid=dept.deptid);
+I tried this
+
+
+
+
+-----------------------------------------------------------------------------------
+-- write a query to display name of all employees along with their salary and deptname
+whose salary is greater than avg salary of HR dept;
+
+
+select ename, salary, deptname 
+from emp join dept
+on emp.deptid=dept.deptid
+where salary >(select avg(salary) from emp join dept
+on emp.deptid=dept.deptid
+where deptname='HR');
+--------------------------------------------------------------------------------------
+
+-- write a query to display name of all employes along with their salary and deptname
+whose salary is greater than avg salary of thier dept
+we cannot use avg in where clause but you can use in having
+
+-select ename, salary, deptname
+--from emp join dept
+--on emp.deptid=dept.deptid
+--where salary > (select avg(salary) from emp right join dept
+--on emp.deptid=dept.deptid
+--where )
+
+select ename, salary, deptname
+from emp e join dept d
+on e.deptid=d.deptid
+where exists
+(select 1 from emp e2 join dept d2
+on e2.deptid=d2.deptid
+where d.deptname= d2.deptname
+group by d2.deptname
+having avg(e2.salary)<=e.salary);
+
+select ename, salary, deptname
+from emp e join dept d
+on e.deptid=d.deptid
+where exists
+(select 1 from emp e2
+where e.deptid=e2.deptid
+having avg(e2.salary)<=e.salary);
+
+
+TO DO:
+1. Revise mysql trainlings slides
+2. Revise codd rules
+3. Redo all day2commands query
+4. Read all normal forms atleast 4 times 
+5. Do 1st 50 questions from 125 queries assignment
+
+

@@ -1,0 +1,20 @@
+			Day6
+
+call sp_loadmp(10000000000);
+
+show indexes from emp;
+
+select * from emp where eid=121;
+
+explain select * from emp where eid=12123;
+
+create indesc emp_eid_idx
+on emp(eid);
+
+
+----------------------- what is row_id --------------------------
+
+it is a physical address of the row
+
+
+entity->relationship->attributes

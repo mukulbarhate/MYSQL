@@ -1,0 +1,278 @@
+4. Find the largest order taken by each salesperson on each date. 
+
+select * from(
+select odate,sname,onum,amt,
+row_number() over(partition by odate,sname order by amt desc) rn
+from salespeople s join orders o
+on s.snum=o.snum) as t
+where rn=1;
+
+
+8. Find the names and numbers of all salespeople
+ who had more than one customer
+
+
+select s.sname,s.snum from salespeople s 
+where exists(select 1 from customers c where 
+c.snum=s.snum having count(*)>1);
+
+select s.sname,s.snum
+from salespeople s , customers c
+where s.snum=c.snum
+group by s.sname,s.snum
+having count(distinct cnum)>1;
+
+
+
+
+10. List the Customer table 
+if and only if one or more of the customers in the Customer table are 
+located in San Jose. 
+
+select * from customers c
+where exists(select 1 from customers where city='San Jose');
+
+
+
+17. Give the sums of the amounts from the Orders table,
+ grouped by date, 
+eliminating all those 
+dates where the SUM was not at least 2000.00 above the MAX amount. 
+
+select odate,round(sum(amt),2),max(amt) from orders
+group by odate
+having sum(amt)>=2000+max(amt);
+
+
+20. Find all pairs of customers having the same rating.
+
+
+select c1.cname c1,c2.cname c2,c1.rating,c2.rating
+from
+customers c1 , customers c2
+where c1.cname<c2.cname
+and c1.rating=c2.rating;
+
+
+21. Find all customers whose CNUM is 1000 above 
+the SNUM of Serres. 
+
+select * from customers where cnum >1000+(select snum from salespeople
+where sname='Serres');
+
+22. Give the salespeople’s commissions as percentages instead of decimal numbers. 
+
+
+select sname,concat(round(comm*100,2),'%') comm_percent from salespeople;
+
+23. Find the largest order taken by each salesperson on each date, eliminating those MAX orders 
+which are less than $3000.00 in value. 
+
+
+select * from (
+select odate,sname,onum,amt,
+row_number() over(partition by odate,sname order by amt desc) rn
+from salespeople s join orders o
+on s.snum=o.snum) as t
+where rn=1 and amt>=3000 ; 
+
+
+
+27. Count the number of salespeople currently listing orders in the Orders table.
+
+select count(distinct snum) from orders;
+
+
+28. Write a query that produces all customers serviced by salespeople with a commission above 
+12%. Output the customer’s name and the salesperson’s rate of commission. 
+
+
+select cname,sname,comm
+from salespeople s , customers c
+where c.snum=s.snum
+and comm*100>12;
+
+30. Find salespeople with customers located in their city. 
+
+select distinct sname,
+-- cname,
+s.city from salespeople s,
+customers c
+where s.snum=c.snum
+and s.city=c.city;
+
+
+
+
+31. Find all salespeople whose name starts with ‘P’ and the fourth character is ‘l’. 
+
+
+select * from salespeople 
+where sname like 'P__l%';
+
+
+32. Write a query that uses a subquery to obtain all orders for the customer named Cisneros. 
+Assume you do not know his customer number. 
+
+
+select * from orders where cnum=(select cnum from customers
+where
+cname='Cisneros');
+
+
+
+35. Select all customers whose names fall in between ‘A’ and ‘G’ alphabetical range. 
+
+select * from customers
+where left(cname,1) between 'A' and 'G';
+
+
+
+
+36. Select all the possible combinations of customers that you can assign. 
+
+
+select c1.cname c1,c2.cname c2,c1.rating,c2.rating
+from
+customers c1 , customers c2
+where c1.cname<c2.cname;
+
+
+46. Write a query that produces all pairs of salespeople with themselves as well as duplicate rows 
+with the order reversed. 
+
+
+
+select s1.sname,s2.sname
+from
+SAlespeople s1 , SAlespeople s2;
+
+
+41. Find all orders with amounts smaller than any amount for a customer in San Jose. 
+
+select amt from orders o , customers c 
+where o.cnum=c.cnum and city='San Jose'
+
+select * from orders
+where amt<(select max(amt) from orders o , customers c 
+where o.cnum=c.cnum and city='San Jose')
+
+
+select * from orders
+where amt<any(select amt from orders o , customers c 
+where o.cnum=c.cnum and city='San Jose');
+
+
+44. Write a query that calculates the amount of the salesperson’s commission on each order by a 
+customer with a rating above 100.00. 
+
+
+select sname,cname,rating,amt,comm,amt*comm comm_amt
+from 
+orders o join customers c
+on o.cnum=c.cnum
+join salespeople s
+on o.snum=s.snum
+and rating>100;
+
+select sname,cname,rating,amt,comm,amt*comm comm_amt
+from 
+orders o , customers c,salespeople s
+where o.cnum=c.cnum
+and
+o.snum=s.snum
+and rating>100;
+
+select round(10.3456,2);
+
+
+select floor(10.2);
+
+select floor(-10.2);
+
+
+select ceiling(10.2);
+
+select ceiling(-10.2);
+
+
+select power(2,10);
+
+select sqrt(16);
+
+select mod(10,3);
+
+
+select abs(-10);
+
+
+select round(27/5)*5;
+
+select round(28/5)*5;
+
+substring
+
+select substring('abcdef',2,3);
+
+instr
+select instr('abc','ab');
+select instr('abc','c');
+select instr('abc','d');
+
+left
+select left('abcdef',3);
+
+right
+select right('abcdef',3);
+ltrim
+select ltrim('    abba   ');
+
+rtrim
+select rtrim('    abba   ');
+
+trim
+select trim('    abba   ');
+
+replace
+select replace('abcdeasfa','a','z');
+
+reverse
+select reverse('abc');
+
+
+select length('abc');
+
+
+select replace('abcdeasfa','a','z');
+
+select instr
+
+
+0- get the part of the string which is before the 1st occurence
+1- find the position of 1st occurence
+2- replace the first occurence with new string
+3- get the part of the string which is after the 1st occurence
+4- concat all the string from 0 to 3
+
+select substring('abcdeasfa',1,instr('abcdeasfa','a')-1);
+select instr('abcdeasfa','a');
+select 'z';
+select substring('abcdeasfa',instr('abcdeasfa','a')+length('a'));
+
+
+select concat(
+substring('abcdeasfa',1,instr('abcdeasfa','a')-1),
+'z',
+substring('abcdeasfa',instr('abcdeasfa','a')+length('a')));
+
+
+select datediff(current_date(),'2024-01-01');
+
+select date_add(current_date() , interval 10 day);
+
+
+select date_format(curdate(),"%Y");
+select date_format(curdate(),"%Y-%D-%M");
+
+
+show variables like 'transaction_isolation';

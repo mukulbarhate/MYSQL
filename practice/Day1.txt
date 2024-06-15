@@ -1,0 +1,151 @@
+mysql -uroot -pmysql@123
+
+show databases;
+select version();
+
+select database();
+
+use mysql;
+
+create database practice;
+
+
+use practice;
+
+show tables;
+
+create table t1(c1 int, c2 varchar(100), c3 date);
+
+select current_date();
+
+desc t1;
+
+
+select * from t1;
+
+########################### 	INSERT   ####################################33
+
+insert into t1(c1, c2, c3) 
+values(1,'a','2024-05-11');
+
+insert into t1(c1,c2,c3)
+values
+(3,'c','2023-03-23'),
+(4,'d','2022-12-12'),
+(5,'e','2024-10-23');
+
+insert into t1
+values(6,'f',current_date());
+
+insert into t1 
+values(7,'g','2021-06-12');
+
+############################	DISPLAY  ####################################
+
+select * from t1 where c1=1;
+select * from t1 where c3=current_date();
+
+select * from t1 where c1 in (1,5,3,2);
+
+select * from t1 where c1=1 or c1=5 or c1=6;
+
+select * from t1 where c1 not in (5,3,2);
+
+select * from t1 where c1 between 3 and 6;
+
+select * from t1 where c1 not between 3 and 6;
+
+select * from t1 where c3 is null;
+
+select * from t1 where c3 !=current_date();
+
+######################	UPDATE	###########################3
+
+update t1 set c2='o', c3='2021-2-3' where c1=5;
+
+#################### DELETE  ###############################333
+
+delete from t1 where c2='h';
+
+#################### ALTER  #############################
+
+alter table t1 add c4 int;
+alter table t1 drop column c4;
+
+alter table t1 modify column c2 varchar(200);
+alter table t1 modify column c2 varchar(100) not null;
+alter table t1 alter column c2 set default 'XXX';
+
+
+alter table t1 rename to t2;
+alter table t2 rename to t1;
+
+alter table t1 rename column c1 to c5;
+
+insert into t1 (c1,c2) values(
+10,'a');
+
+insert into t1 (c1,c2) values(
+10, null);
+
+alter table t1 rename column c1 to c5;
+
+#############################	NEW TABLE	####################################
+
+create table t1_uk(c1 int unique, c2 varchar(100));
+
+insert into t1_uk values(1,'a');
+
+insert into t1_uk values(null,'b');
+
+delete from t1_uk where c1=null;
+
+create table t1_uk_comp(c1 int, c2 int, c3 varchar(100), unique(c1,c2));
+
+insert into t1_uk_comp values(1,1,'a');
+
+insert into t1_uk_comp values(1,2,'a');
+
+insert into t1_uk_comp values(2,2,'a');
+
+insert into t1_uk_comp values(2,2,'a');
+
+create table t1_pk(c1 int primary key, c2 varchar(100));
+
+insert into t1_pk values(1,'a');
+insert into t1_pk values(2,'b');
+insert into t1_pk values(null,'b');
+
+create table t1_pk_multi(c1 int primary key, c2 int unique key);
+
+create table t1_pk_mulit(c1 int, c2 int, c3 varchar(100), primary key(c1,c2));
+
+alter table t1_pk_multi add constraint t1_uk_multi unique(c2);
+
+create table t1_diff(c1 int, c2 date, c3 varchar(100),
+unique(c1,c2,c3));
+
+use information_schema;
+
+show tables like '%cons%';
+
+desc table_constraints;
+
+select * from table_constraints where table_schema='practice1' and table_name='t1_diff';
+
+show create table t1_diff;
+
+select column_name,column_key from information_schema.columns 
+where table_schema='practice1' and table_name='t1_diff';
+
+create table t1_nn(c1 int, c2 int not null);
+
+insert into t1_nn values(1);
+insert into t1_nn values(1,null),(2,1);
+
+create table t_check(eid int, ename varchar(100), salary int check(salary>=2000));
+
+insert into t_check(1,'a',20000);
+
+
+

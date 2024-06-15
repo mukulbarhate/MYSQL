@@ -1,0 +1,295 @@
+delimiter $$
+create function sf_closestmultiple(num int, multi int)
+returns int
+DETERMINISTIC
+begin
+return(round(num/multi)*multi);
+end;
+$$
+
+delimiter ;
+
+select sf_closestmultiple(27,5);
+
+
+select routine_type,routine_name,routine_body,
+routine_definition
+from information_schema.routines
+where routine_schema='vita2024';
+
+drop function sf_replace_first;
+
+delimiter $$
+create function sf_replace_first(str varchar(200),old_char varchar(200), new_char varchar(200))
+returns varchar(200)
+deterministic
+begin
+return( concat(
+substring(str,1,instr(str,old_char)-1),
+case when instr(str,old_char)>0 then new_char else '' end,
+substring(str,instr(str,old_char)+ case when instr(str,old_char)>0 then  length(old_char) else 1 end)));
+end;
+$$
+delimiter ;
+
+
+delimiter $$
+
+create function sf_fact(num int)
+returns bigint
+deterministic
+begin
+declare fact bigint ;
+declare i int;
+set i=2;
+set fact=1;
+while(i<=num) do
+set fact=fact*i;
+set i=i+1;
+end while;
+return(fact);
+end;
+$$
+delimiter ;
+
+
+select sf_fact(5);
+
+
+drop function sf_checkprime;
+
+delimiter $$
+create function sf_checkprime(num int)
+returns varchar(100)
+deterministic
+begin
+declare i int;
+set i=2;
+while(i<=num/2)
+do
+if mod(num,i)=0 then
+return(concat(num,' is not a prime number'));
+end if;
+set i=i+1;
+end while;
+return(concat(num,' is a prime number'));
+end;
+$$
+delimiter ;
+
+
+delimiter $$
+create function sf_getdept(v_eid int)
+returns varchar(100)
+READS SQL Data
+begin
+declare v_dept varchar(100);
+select deptname into v_dept from emp join dept
+on emp.deptid=dept.deptid
+where eid=v_eid limit 1;
+return(v_dept);
+end;
+$$
+delimiter ;
+
+select sf_getdept(1);
+
+select eid,sf_getdept(eid) deptname from emp;
+
+delimiter $$
+create procedure sp_ins_emp(v_eid int, v_ename varchar(100),
+v_salary int, v_deptid int)
+begin
+insert into emp (eid,ename,salary,deptid) values
+(v_eid,v_ename,v_salary,v_deptid);
+end;
+$$
+delimiter ;
+
+call sp_ins_emp(100,'a100',100,1);
+
+
+-- write a procudre that takes input a number and does the following
+--done job
+1. truncate the existing data from emp-- done
+2. inserts as many rows as the input number in the emp table-- done
+3. for EID the values is sequenetial- 1,2,3,4...n-- done
+4. for ename the values are like this - a1,b2,c3,...z26,a27,a28....-- done
+5. for salary the values should be random- 13232,3435,6664,2444,6654-- done
+6. for deptid the values should be 1,2,3,1,2,3,1,2,3,1,2,3...-- done
+7. procedue should commit the inserts in a batch of 50000 rows-- done
+
+
+delimiter $$
+create procedure sp_loademp(num int)
+begin
+declare  i int;
+truncate table emp;
+set i=1;
+start transaction;
+while(i<=num)
+do
+insert into emp(eid,ename,salary,deptid)
+values(i
+,concat(convert(char(mod(i-1,26)+97),char(1)),i)
+,rand()*100000
+,mod(i-1,3)+1);
+if mod(i,50000)=0 then
+commit;
+start transaction;
+end if;
+set i=i+1;
+end while;
+commit;
+end;
+$$
+delimiter ;
+
+call sp_loademp(100000);
+
+
+
+delimiter $$
+create procedure sp_getename()
+begin
+declare flag int default 0;
+declare v_ename varchar(100);
+declare c1 cursor for select ename from emp;
+declare continue handler for not found set flag=1;
+open c1;
+myloop:loop
+fetch c1 into v_ename;
+if flag=1 then
+leave myloop;
+end if;
+select v_ename;
+end loop;
+close c1;
+end;
+$$
+delimiter ;
+
+
+call sp_loademp(30);
+call sp_getename();
+
+
+--write a function that takes input a deptname and returns name of all the employee in it as a comma separated list
+HR-> a1,d3,f6...
+
+
+drop function sf_getelist;
+delimiter $$
+create function sf_getelist(v_dept varchar(100))
+returns text
+reads sql data
+begin
+declare elist text default '';
+declare flag int default 0;
+declare v_ename varchar(100);
+declare c1 cursor for select ename from emp , dept 
+where emp.deptid=dept.deptid and deptname=v_dept;
+declare continue handler for not found set flag=1;
+open c1;
+myloop:loop
+fetch c1 into v_ename;
+if flag=1 then
+leave myloop;
+end if;
+set elist=concat(elist,',',v_ename);
+end loop;
+close c1;
+return(substring(elist,2));
+end;
+$$
+delimiter ;
+
+select sf_getelist('HR');
+
+
+select deptname,sf_getelist(deptname) elist from dept;
+
+
+
+create table custprod (cid int , pid int);
+
+insert into custprod values(1,1);
+insert into custprod values(1,5);
+insert into custprod values(1,6);
+insert into custprod values(1,7);
+insert into custprod values(1,9);
+insert into custprod values(2,1);
+insert into custprod values(2,3);
+insert into custprod values(2,8);
+insert into custprod values(2,10);
+insert into custprod values(3,2);
+insert into custprod values(3,5);
+insert into custprod values(3,9);
+
+select * ,concat(round(num*100.0/den,1),'%') as similarity
+from
+(select c1.cid c1,c2.cid c2,
+count(case when c1.pid=c2.pid then c1.pid else null end) num,
+count(distinct c1.pid)+ count(distinct c2.pid)-count(case when c1.pid=c2.pid then c1.pid else null end) den
+ from custprod c1, custprod c2
+where c1.cid<c2.cid
+group by c1.cid,c2.cid) as t ;
+
+
+
+
+
+
+52. Write 2 queries that select all salespeople (by name and number) who have customers in their 
+cities who they do not service, one using a join and one a corelated subquery. Which solution 
+is more elegant? 
+
+
+
+select distinct s.sname,s.snum,s.city
+from salespeople s, customers c
+where s.snum!=c.snum
+and s.city=c.city;
+
+
+
+
+select s.sname,s.snum,s.city
+from salespeople s
+where exists (select 1 from  customers c
+where s.snum!=c.snum
+and s.city=c.city);
+
+
+
+55. Write a query that produces all pairs of orders by a given customer. Name that customer and 
+eliminate duplicates. 
+
+
+
+select cname,o1.onum,o2.onum
+from orders o1, orders o2, customers c
+where o1.cnum=o2.cnum
+and o1.onum<o2.onum
+and o1.cnum=c.cnum;
+
+
+60. Write a query that selects all orders save those with zeroes or NULLs in the amount field.
+
+
+select * from orders where amt =0 or amt is null;
+
+select * from orders where amt !=0 ;
+
+
+65. Write a query that produces the names and ratings of all customers
+ of all who have above 
+average orders. 
+
+
+select cname,rating,avg(amt) from customers c , orders o
+where c.cnum=o.cnum
+group by cname,rating 
+having  avg(amt)
+>(select avg(amt) from orders);
+

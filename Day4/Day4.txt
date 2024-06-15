@@ -1,0 +1,261 @@
+				Day4
+
+phantom reads - 
+
+
+------------------------ This is how to create function in MySQL ------------------------------------
+delimiter $$
+create function sf_closesmultiple(num int, multi int)
+returns int
+DETERMINISTIC
+begin
+return (round(num/multi)*multi);
+end;
+$$
+
+delimiter ;
+
+select sf_closesmultiple(27,5);
+
+delimiter $$
+create function sf_replace_first(str varchar(200), old_char varchar(200), new_char varchar(200))
+returns varchar(200)
+deterministic
+begin
+return (concat(
+substring(str,1,instr(str,old_char)-1),
+case when instr(str,old_char)>0 then new_char else '' end,
+substring(str, instr(str,old_char)+ case when instr(str,old_char)>0 then 
+length(old_char) else 1 end)));
+end;
+$$
+
+delimiter ;
+
+select sf_replace_first('abcdefghabcdefgh', 'abc', 'xyz');
+
+delimiter $$
+create function sf_fact(num int)
+returns bigint
+deterministic
+begin
+declare fact bigint ;
+declare i int;
+set i=2;
+set fact=1;
+while(i<=num) do
+set fact=fact*i;
+set i=i+1;
+
+end while;
+return(fact);
+end;
+$$ 
+
+delimiter ;
+
+select sf_fact(5);
+
+delimiter $$
+create function sf_prime(num int)
+returns varchar(100)
+deterministic
+begin
+declare i int;
+set i=2;
+while(i<=num/2) do
+if mod(num, i)=0 then
+return(concat(num,' is not a prime number.'));
+end if;
+set i=i+1;
+end while;
+return(concat(num,' is a prime number.'));
+end;
+$$
+
+delimiter ;
+
+
+select sf_prime(5);
+
+
+delimiter $$
+create function sf_getdept(v_eid int)
+returns varchar(100)
+READS SQL Data
+begin
+declare v_dept varchar(100);
+select deptname into v_dept from emp join dept
+on emp.deptid=dept.deptid
+where eid=v_eid limit 1;
+return(v_dept);
+end;
+$$
+
+delimiter ;
+
+select sf_getdept(1);
+
+select eid, sf_getdept(eid) deptname from emp;
+
+
+------------------------------------ PROCEDURE -------------------------------------
+
+1. It doesnot have any return type.
+2. It cannot be called from any query(select).
+
+delimiter $$
+create procedure sp_ins_emp(v_eid int, v_ename varchar(100),
+v_salary int, v_deptid int)
+begin
+insert into emp(eid, ename, salary, deptid) 
+values (v_eid, v_ename, v_salary, v_deptid);
+
+end;
+$$
+
+delimiter ;
+
+call sp_ins_emp(100,'a100',100,1);
+
+-- write a procedure that takes input a number and does the following job;
+1. truncate the existing data from emp -- done
+2. inserts as any rows as teh input number in the emp table -- done
+3. for EID the values is sequential - 1, 2, 3, 4....n	-- done
+4. for enmae the values are like this - a1, b2, c3 ..... z26, a27, a28,,,,
+5. for salary the values should be random- 13232, 3435, 6664, 2444..
+6. for deptid the values should be from 1-3
+
+delimiter $$
+create procedure sp_loademp(num int)
+begin
+declare i int;
+truncate table emp;
+set i=1;
+start transaction;
+while(i<=num) do
+insert into emp(eid, ename, salary, deptid)
+values(i,
+concat(convert(char(mod(i-1,26)+97),char(1)),i),
+rand()*1000000,
+mod(i-1,3)+1);
+if mod(i, 5000) = 0 then
+commit;
+start transaction;
+end if;
+set i=i+1;
+end while;
+end;
+$$
+delimiter ;
+
+call sp_loademp(100);
+
+---------------------------------- CURSOR -------------------------------
+Creating a cursor
+1. Declare cursor
+2. Declare not found handler for cursor
+3. Open cursor
+4. Fetch data from cursor in an loop
+5. Close cursor.
+
+
+delimiter $$
+create procedure sp_getname()
+begin
+declare flag int default 0;
+declare v_ename varchar(100);
+declare c1 cursor for select ename from emp;
+declare continue handler for not found set flag=1;
+open c1;
+myloop:loop
+fetch c1 into v_ename;
+if flag=1 then
+leave myloop;
+end if;
+select v_ename;
+end loop;
+close c1;
+end;
+$$
+delimiter ;
+
+call sp_getname(10);
+call sp_getname();
+
+
+-- write a function that takes input a deptname and returns name of all the employee in it as a comma separated list
+HR -> a1, d3, f6 ....
+
+delimiter $$
+create function sf_getelist(v_dept varchar(100))
+returns text
+reads sql data
+begin
+declare elist text default '';
+declare flag int default 0;
+declare v_ename varchar(100);
+declare c1 cursor for select ename from emp, dept 
+where emp.deptid=dept.deptid and deptname=v_dept;
+declare continue handler for not found set flag=1;
+open c1;
+myloop : loop
+fetch c1 into v_ename;
+if flag=1 then
+leave myloop;
+end if;
+set elist=concat(elist,',',v_ename);
+end loop;
+close c1;
+return(substring(elist,2));
+end;
+$$
+delimiter ;
+
+select sf_getelist('HR');
+
+select deptname, sf_getelist from dept;
+
+
+ratio of numertor count of common product betw two customers
+ to denominator countof total distinct product
+
+
+create table custprod(custId int, prodId int);
+
+insert into custprod values(1,1);
+insert into custprod values(1,5);
+insert into custprod values(1,6);
+insert into custprod values(1,7);
+insert into custprod values(1,9);
+insert into custprod values(2,1);
+insert into custprod values(2,3);
+insert into custprod values(2,8);
+insert into custprod values(2,10);
+insert into custprod values(3,2);
+insert into custprod values(3,5);
+insert into custprod values(3,9);
+
+select *, concat(round(num*100.0/den,1),'%') as similarity
+from
+(select c1.cid c1,c2.cid c2, count())
+
+select c1, c2 
+from custprod c1, custprod c2 
+where c1.cid<c2.cid
+group by c1.cid,c2.cid;
+
+
+
+
+
+
+
+
+
+
+
+
+ASSIGNMENT
+1. Write a function to replace the nth occurrence.
+2. How to find coprime number

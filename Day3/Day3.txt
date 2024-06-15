@@ -1,0 +1,104 @@
+				Day3
+
+------------------- Built-in Function --------------------
+*********** Numeric ********************
+
+select round(10.246);
+
+select floor(10.2);
+
+select floor(-10.2);
+
+select ceiling(10.2);
+
+select ceiling(-10.2);
+
+select power(2, 3);
+
+select sqrt(16);
+
+select mod(10, 3);
+
+select abs(-10);
+
+-- This are commonly used
+
+select round(27/5)*5 roundOf;	-- round of to the nearest number of multiple of 5
+
+************ String *****************
+
+select substring('abcdef',2, 4); 
+
+select instr('abc', 'abc');
+select instr('abc', 'c');
+select instr('abc', 'd');
+
+select left('abcdef', 3);
+
+select right('abcdef', 1);
+
+select ltrim('   baba  ');
+
+select rtrim('   baba  ');
+
+select trim('   baba  ');
+
+select replace('ababcd', 'a', 'y');
+
+select reverse('zys');
+
+select length('abcd');
+
+select substring('abcdef',2, 4); 
+
+select replace('ababcd', 'a', 'y');
+
+------- ALGORITHM FOR  ------------------
+
+0- get the part of the string which is before the 1st occurence
+1- find the position of 1st occurence
+2- replace the first occurence with new string
+3- get the part of the string which is after the 1st occurence
+4- concat all the string from 0 to 3
+
+
+select substring('bzzabcdabds', 1, instr('bzzabcdabds', 'a')-1);
+select instr('bzzabcdabds', 'a');
+
+
+select substring('abcdabds', 1, instr('abcdabds', 'a')-1);
+select replace('abcdabds',instr('abcdabds', 'a')-1, 'z');
+select replace('abcdabds', substring('abcdabds', 1, instr('abcdabds', 'a')-1), 'y');
+
+-------------- current date & time --------------
+
+select datediff(current_date(), '2024-01-1');
+
+select date_add(current_date(), interval 10 day);
+
+select date_add(current_date(), interval 10 month);
+
+select date_format(curdate(),"%Y");
+
+select date_format(curdate(),"%M");
+
+select date_format(current_date(),"%m-%M-%Y");
+
+------------------------------- NORMALIZATION ------------------------------------
+
+------------ READ UNCOMMITTED ------------------
+
+show vairabesl like
+
+1. Revise mysql trianing slides
+2. Revise Normal fomrs;
+3. Revise COD Rules
+4
+
+UPDATE salespeople
+SET city = 'London'
+WHERE city = 'Landon';
+
+
+
+

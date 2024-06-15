@@ -1,0 +1,173 @@
+create table emp_audit
+(upd_date datetime,
+upd_user varchar(100),
+old_eid int, 
+new_eid int,
+old_ename varchar(100),
+new_ename varchar(100),
+old_salary int,
+new_salary int,
+old_deptid int,
+new_deptid int
+);
+
+
+delimiter $$
+create trigger trig_upd_emp
+after update on emp
+for each row
+begin 
+insert into emp_audit(
+upd_date,
+upd_user,
+old_eid,
+new_eid,
+old_ename,
+new_ename,
+old_salary,
+new_salary,
+old_deptid,
+new_deptid)
+values(now(), user
+(), old.eid, new.eid,old.ename,new.ename, old.salary, new.salary,old.deptid,new.deptid);
+end;
+$$
+
+delimiter ;
+
+update emp set salary=salary+100 where eid=(1);
+
+select * from emp_audit;
+
+drop trigger trig_del_emp;
+
+delimiter $$
+create trigger trig_del_emp
+after delete on emp
+for each row
+begin 
+insert into emp_audit(
+upd_date,
+upd_user,
+old_eid,
+new_eid,
+old_ename,
+new_ename,
+old_salary,
+new_salary,
+old_deptid,
+new_deptid)
+values(now(), user
+(), old.eid, null,old.ename,null, old.salary, null,old.deptid,null);
+end;
+$$
+
+delimiter ;
+
+delete from emp where old_eid=1;
+delete from emp_audit where old_eid=1;
+
+
+delimiter $$
+create trigger trig_insert_emp
+after insert on emp
+for each row
+begin 
+insert into emp_audit(
+upd_date,
+upd_user,
+old_eid,
+new_eid,
+old_ename,
+new_ename,
+old_salary,
+new_salary,
+old_deptid,
+new_deptid)
+values(now(), user
+(), old.eid, null.eid,old.ename,null.ename, old.salary, null.salary,old.deptid,null.deptid);
+end;
+$$
+
+delimiter ;
+
+
+
+update emp set salary=salary+100 where eid=2;
+start transaction ;
+insert into emp (eid) values(1);
+rollback;
+commit;
+
+update emp set salary=salary+100 where eid=3;
+start transaction ;
+insert into emp (eid) values(100);
+commit;
+rollback;
+
+--------------------------------------------- VIEW ----------------------------------------
+
+create table vw_emp_dept  as select ename, salary, deptname from emp join dept on emp.deptid=dept.deptid;
+
+update vw_emp_dept set salary=1000, deptname='HR'
+where ename='d4';
+
+delete from vw_emp_dept
+where ename='d4';
+
+update vw_emp_dept set salary=1000
+where ename='d4';
+
+create vw_emp_dept set salary= 
+
+
+
+
+-------------------- Myisam ----------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+1. write a function that takes input a number that be as big as 8 digit number and it returns the output of the numbers in words.
+
+technical
+business
+communication skills
+
+
+
+
+
+
+OS
+Deadlocks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

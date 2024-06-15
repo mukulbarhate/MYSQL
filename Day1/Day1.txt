@@ -1,0 +1,884 @@
+ 			Day 1
+
+create, select, insert, update, delete, drop,
+create table t1(id int, iname varchar(100));
+desc t1;
+select * from t1;
+insert into t1(id, inmae) values(1,'a'), (2,'b');
+update t1 set iname='Per' where id =1;
+delete from t1 where id=1;
+
+alter table t1 modify column c2 varchar(200) not null;
+
+
+-- for version
+select version();
+
+information schema has metadata of mysql
+
+performance schema is for performance of mysql
+
+select databases; -> to see the databases available in the mysql
+
+
+mysql -uroot -pmysql@123
+
+show databases;
+
+select version();
+
+select database();
++--------------------+
+| Database           |
++--------------------+
+| hello              |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+
+
+use mysql;
+create database vita2024;
+
+use vita2024;
+
+show tables;
+
+create table t1(c1 int, c2 varchar(100), c3 date);
+
+show current_date();	-> show current date
+
+desc t1; -> showing the structure of table
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| c1    | int          | YES  |     | NULL    |       |
+| c2    | varchar(100) | YES  |     | NULL    |       |
+| c3    | date         | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+select * from t1; -> to see what is there in the database which you have selected
+Empty set (0.01 sec)
+
+
+-- Insert is used to add columns 
+
+insert into t1(c1, c2, c3)
+values(1, 'a', '2024-02-03');
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
++------+------+------------+
+
+
+insert into t1(c1, c2, c3)
+values
+(2, 'b', '2024-05-03'),
+(3, 'c', '2024-05-8'),
+(4, 'd', '2023-09-12');
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
++------+------+------------+
+4 rows in set (0.00 sec)
+
+insert into t1
+values(6, 'f', '2035-06-03');
+
+insert into t1(c1, c2)
+values(7, 'g');
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+7 rows in set (0.00 sec)
+
+
+select * from t1 where c1=3;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    3 | c    | 2024-05-08 |
++------+------+------------+
+1 row in set (0.00 sec)
+
+select * from t1 where c1!=3;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+6 rows in set (0.00 sec)
+
+select * from t1 where c1> 4;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+3 rows in set (0.00 sec)
+
+select * from t1 where c1< 4;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
++------+------+------------+
+3 rows in set (0.00 sec)
+
+select * from t1 where c1<=4;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
++------+------+------------+
+4 rows in set (0.00 sec)
+
+select * from t1 where c1>=3;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+5 rows in set (0.00 sec)
+
+
+select * from t1 where c1 in (1, 4,5);
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
++------+------+------------+
+3 rows in set (0.00 sec)
+
+select * from t1 where c1 not in (1, 4,5);
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+4 rows in set (0.00 sec)
+
+select * from t1 where c1 between 3 and 6;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
++------+------+------------+
+4 rows in set (0.01 sec)
+
+select * from t1 where c3 is null;
++------+------+------+
+| c1   | c2   | c3   |
++------+------+------+
+|    7 | g    | NULL |
+|   12 | y    | NULL |
++------+------+------+
+2 rows in set (0.00 sec)
+
+select * from t1 where c3 is not null;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
++------+------+------------+
+7 rows in set (0.00 sec)
+
+select * from t1 where c3 = current_date();
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    5 | e    | 2024-04-03 |
++------+------+------------+
+1 row in set (0.01 sec)
+
+
+select * from t1 where c3 != current_date();	-> null will not come in any of = or !=
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | b    | 2024-05-03 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
++------+------+------------+
+6 rows in set (0.00 sec)
+
+select * from t1 where c1=1 or c1=7;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    7 | g    | NULL       |
++------+------+------------+
+2 rows in set (0.00 sec)
+
+select * from t1 where c1=7 and c1=7;
+
+update t1 set c2='x',c3='2024-06-4' where c1 =2;
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    7 | g    | NULL       |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
++------+------+------------+
+9 rows in set (0.00 sec)
+
+delete from t1 where c1=7;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
++------+------+------------+
+
+-----------------modify the structure use alter--------------------
+alter table t1 add c4 int;
++------+------+------------+------+
+| c1   | c2   | c3         | c4   |
++------+------+------------+------+
+|    1 | a    | 2024-02-03 | NULL |
+|    2 | x    | 2024-06-04 | NULL |
+|    3 | c    | 2024-05-08 | NULL |
+|    4 | d    | 2023-09-12 | NULL |
+|    5 | e    | 2024-04-03 | NULL |
+|    6 | f    | 2035-06-03 | NULL |
+|    9 | q    | 2045-07-03 | NULL |
+|   12 | y    | NULL       | NULL |
+|    7 | g    | NULL       | NULL |
++------+------+------------+------+
+9 rows in set (0.09 sec)
+
+alter table t1 drop column c4;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
+|    7 | g    | NULL       |
++------+------+------------+
+9 rows in set (0.00 sec)
+
+alter table t1 modify column c2 varchar(200);
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| c1    | int          | YES  |     | NULL    |       |
+| c2    | varchar(200) | YES  |     | NULL    |       |
+| c3    | date         | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+
+alter table t1 modify column c2 varchar(200) not null;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| c1    | int          | YES  |     | NULL    |       |
+| c2    | varchar(200) | NO   |     | NULL    |       |
+| c3    | date         | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+
+alter table t1 rename to t3;
+
+alter table t3 rename to t1;
+
+alter table t1 modify column c3 date default '2024-06-20';
++-------+--------------+------+-----+------------+-------+
+| Field | Type         | Null | Key | Default    | Extra |
++-------+--------------+------+-----+------------+-------+
+| c1    | int          | YES  |     | NULL       |       |
+| c2    | varchar(200) | YES  |     | NULL       |       |
+| c3    | date         | YES  |     | 2024-06-20 |       |
++-------+--------------+------+-----+------------+-------+
+
+alter table t1 modify column c3 date default current_date(); -- gives error
+
+insert into t1(c1, c2) values
+(10,'g');
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
+|    7 | g    | NULL       |
+|   10 | g    | 2024-06-20 |
++------+------+------------+
+ 
+insert into t1(c1, c2) values
+(10,null); -- gives error as null is not allowed in c2 ->->->->TRY THIS DURING PRACTICE
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
+|    7 | g    | NULL       |
+|   10 | g    | 2024-06-20 |
+|   10 | NULL | 2024-06-20 |
++------+------+------------+
+
+alter table t1 rename column c1 to c5;
++------+------+------------+
+| c5   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
+|    7 | g    | NULL       |
+|   10 | g    | 2024-06-20 |
+|   10 | NULL | 2024-06-20 |
++------+------+------------+
+
+
+alter table t1 rename column c5 to c1;
++------+------+------------+
+| c1   | c2   | c3         |
++------+------+------------+
+|    1 | a    | 2024-02-03 |
+|    2 | x    | 2024-06-04 |
+|    3 | c    | 2024-05-08 |
+|    4 | d    | 2023-09-12 |
+|    5 | e    | 2024-04-03 |
+|    6 | f    | 2035-06-03 |
+|    9 | q    | 2045-07-03 |
+|   12 | y    | NULL       |
+|    7 | g    | NULL       |
+|   10 | g    | 2024-06-20 |
+|   10 | NULL | 2024-06-20 |
++------+------+------------+
+
+
+--------------Constraints---------------------
+mysql will allow more than null
+
+------------ UNIQUE KEY ---------------------
+
+create table t1_uk(c1 int unique, c2 varchar(100));
+
+insert into t1_uk values(1,'a'); -- works
++------+------+
+| c1   | c2   |
++------+------+
+|    1 | a    |
++------+------+
+
+insert into t1_uk values(1,'b'); -- fails
+ERROR 1062 (23000): Duplicate entry '1' for key 't1_uk.c1'
+
+insert into t1_uk values(null,'b'); -- works
++------+------+
+| c1   | c2   |
++------+------+
+|    1 | a    |
+| NULL | b    |
++------+------+
+
+insert into t1_uk values(null,'b'); -- works
++------+------+
+| c1   | c2   |
++------+------+
+|    1 | a    |
+| NULL | b    |
+| NULL | b    |
++------+------+
+
+create table t1_uk_comp(c1 int, c2 int, c3 varchar(100),
+unique(c1, c2);
+
+insert into t1_uk_comp values(1, 1, 'a');
+insert into t1_uk_comp values(1, 2, 'a');
+insert into t1_uk_comp values(2, 2, 'a');
+insert into t1_uk_comp values(2, 2, 'b');	-- fails cuz of duplicate value as above
+
+--------------- PRIMARY KEY --------------------
+
+create table t1_pk(c1 int primary key, c2 varchar(100));
+
+
+insert into t1_pk values(1, 'a');   --works
+
+insert into t1_pk values(1, 'b');   --fails
+
+insert into t1_pk values(null, 'b');  --fails
+
+create table t1_pk_multi(c1 int primary key, c2 int primary key);  --fails
+
+create table t1_pk_multi(c1 int , c2 int, c3 varchar(100), primary key(c1, c2));  --works
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| c1    | int          | NO   | PRI | NULL    |       |
+| c2    | int          | NO   | PRI | NULL    |       |
+| c3    | varchar(100) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+
+
+alter table t1_pk_multi add constraints t1_uk_multi unique(c2);
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| c1    | int          | NO   | PRI | NULL    |       |
+| c2    | int          | NO   | PRI | NULL    |       |
+| c3    | varchar(100) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+
+
+create table t1_diff(c1 int, c2 date, c3 varchar(100), unique(c1, c2, c3));
+
+use information_schema;	 -- stores the metadata information of database
+
+show tables like '%cons%';
++---------------------------------------+
+| Tables_in_information_schema (%CONS%) |
++---------------------------------------+
+| CHECK_CONSTRAINTS                     |
+| REFERENTIAL_CONSTRAINTS               |
+| TABLE_CONSTRAINTS                     |
+| TABLE_CONSTRAINTS_EXTENSIONS          |
++---------------------------------------+
+
+desc TABLE_CONSTRAINTS;
++--------------------+-------------+------+-----+---------+-------+
+| Field              | Type        | Null | Key | Default | Extra |
++--------------------+-------------+------+-----+---------+-------+
+| CONSTRAINT_CATALOG | varchar(64) | YES  |     | NULL    |       |
+| CONSTRAINT_SCHEMA  | varchar(64) | YES  |     | NULL    |       |
+| CONSTRAINT_NAME    | varchar(64) | YES  |     | NULL    |       |
+| TABLE_SCHEMA       | varchar(64) | YES  |     | NULL    |       |
+| TABLE_NAME         | varchar(64) | YES  |     | NULL    |       |
+| CONSTRAINT_TYPE    | varchar(11) | NO   |     |         |       |
+| ENFORCED           | varchar(3)  | NO   |     |         |       |
++--------------------+-------------+------+-----+---------+-------+
+
+select * from table_constraints where table_schema='vita2024' and table_name='t1_diff'
+show create table t1_diff;
+
+select column_name, column_key from information_schema.columns where table_schema='vita2024' and table_name='t1_diff';
++-------------+------------+
+| COLUMN_NAME | COLUMN_KEY |
++-------------+------------+
+| c1          | MUL        |
+| c2          |            |
+| c3          |            |
++-------------+------------+
+
+------------------ NOT NULL----------------------
+
+crate table t1_nn(c1 int, c2 int not null);
+
+insert into t1_nn values(1, null);  --fails
+
+---------------- CHECK CONSTRAINT----------------
+
+create table t_check(eid int, ename varchar(100), salary int check(salary>=2000));
+
+insert into t_check values(1, 'a', 100);   -- fails 
+
+insert into t_check values(1, 'a', null);  -- works
+
+insert into t_check values(1, 'a', 2000);  -- works
++------+-------+--------+
+| eid  | ename | salary |
++------+-------+--------+
+|    1 | a     |   NULL |
+|    1 | a     |   2000 |
++------+-------+--------+
+
+------------ FOREIGN KEY ---------------
+foreign key is important for RDBMS
+
+create table t_parent(deptid int primary key, deptname varchar(100));
+create table t_child(eid int, ename varchar(100), deptid int,
+foreign key (deptid) references t_parent(deptid));	-- we have created foreign key to deptid cuz that is the only value which is comman and it has to access through other table
+
+insert into t_child values(1, 'a', 4);  --fails
+
+insert into t_parent values(4,'HR');	-- here we created the place for 'HR' in the table with the id of 4
++--------+----------+
+| deptid | deptname |
++--------+----------+
+|      4 | HR       |
++--------+----------+
+
+insert into t_child values(1, 'a', 4);  --works		-- now we can execute this line
+
+insert into t_child values(1, 'a', null);  --works	-- this will also work cuz it accept null value also
++------+-------+--------+
+| eid  | ename | deptid |
++------+-------+--------+
+|    1 | a     |      4 |
+|    1 | a     |   NULL |
+|    2 | a     |   NULL |
++------+-------+--------+
+
+insert into t_child values(1, 'a', 3);  --works
++------+-------+--------+
+| eid  | ename | deptid |
++------+-------+--------+
+|    1 | a     |      4 |
+|    1 | a     |   NULL |
+|    2 | a     |   NULL |
+|    1 | a     |      3 |
++------+-------+--------+
+
+
+-------------- DEFAULT ----------------------
+
+create table t_default(id int, salary int default 1000);
+
+
+insert into t_default(id) values(1);
+
+insert into t_default(id, salary) values(1, null);
+
+------------- TRANSACTION CONTROL ------------
+
+select * from t_check;
+start transaction;
+update t_check set salary= 3000;
+rollback;
+
+start transaction;
+update t_check set salary= 3000;
+commit;					-- automacity fully committed or rollback.
+
+
+------------ AGGREGATE FUNCTION ------------------	it doesn't take any null values for calculation
+-------------- COUNT ----------
+
+select count(*) from t1;
+
+select count(c3) from t1;
+
+select count(*), count(c3), count(c1) from t1;
+
+select count(*),count(1), count(c3), count(c1) from t1;	-- count(*) & count(1) are same it will give the same value
+
+-------------- SUM -------------
+
+select sum(c1) from t1;
+
+select avg(c1) from t1;
+
+select max(c1) from t1;
+
+select min(c1) from t1;
+
+
+
+-------------------------------- JOINS ----------------------------------
+
+Joins are used to retrieve columns from mutiple tables in the same query.
+
+Cross Join every row of 1 table will be connected to every row of table 2
+
+drop table t1;
+create table t1 (c1 int, c2 varchar(10));
+create table t2(c1 int, c3 varchar(10));
+
+insert into t1 values(1, 'a'), (2, 'b'), (3, 'c');
+insert into t2 values(3, 'x'), (4, 'y'), (5, 'z');
+
+---------- CROSS JOIN ---------------
+-- new/ANSI standard syntax
+
+select * from t1 cross join t1;  -- error
+
+select t1.c1, c2, c3 from t1 cross join t2;
+
+--old syntax
+
+
+
+--------- INNER JOIN -----------	
+
+-- new/ANSI standard syntax
+
+select * from t1 inner join t2
+on t1.c1 = t2.c1;
+
+select * from t1 join t2 	
+on t1.c1 = t2.c1;
+
+--old syntax
+
+select * from t1, t2
+where t1.c1=t2.c1;
+
+
+-------	LEFT OUTER JOIN -----------
+
+-- new/ANSI standard syntax
+
+select * from t1 left join t2
+on t1.c1 = t2.c1;
+
+
+-------	RIGHT OUTER JOIN -----------
+
+-- new/ANSI standard syntax
+
+select * from t1 right join t2
+on t1.c1 = t2.c1;
+
+------- FULL OUTER JOIN -----------
+it is not supported in MySQL
+
+-- new/ANSI standard syntax
+
+select * from t1 full join t2
+on t1.c1 = t2.c1;
+
+--------------------- TWO SETS UNION, INTERSECTION, MINUS ------------
+
+create table a(id int);
+create table b(id int);
+
+insert into a values(1), (2), (3);
+insert into b values(3), (4),(5);
+
+select * from a
+union
+select * from b;
++------+
+| id   |
++------+
+|    1 |
+|    2 |
+|    3 |
+|    4 |
+|    5 |
++------+
+
+select * from b
+union
+select * from a;
++------+
+| id   |
++------+
+|    3 |
+|    4 |
+|    5 |
+|    1 |
+|    2 |
++------+
+
+select * from a
+union all
+select * from b;
++------+
+| id   |
++------+
+|    1 |
+|    2 |
+|    3 |
+|    3 |
+|    4 |
+|    5 |
++------+
+
+select * from b
+union all
+select * from a;
++------+
+| id   |
++------+
+|    3 |
+|    4 |
+|    5 |
+|    1 |
+|    2 |
+|    3 |
++------+
+
+select * from a
+intersect
+select * from b;
++------+
+| id   |
++------+
+|    3 |
++------+
+
+select * from b
+intersect
+select * from a;
++------+
+| id   |
++------+
+|    3 |
++------+
+
+select * from a
+except
+select * from b;
++------+
+| id   |
++------+
+|    1 |
+|    2 |
++------+
+
+select * from b
+except
+select * from a;
++------+
+| id   |
++------+
+|    4 |
+|    5 |
++------+
+
+
+------------------ FULL JOIN ---------------------
+
+select * from t1 left join t2
+on t1.c1=t2.c1
+union
+select * from t1 right join t2
+on t1.c1=t2.c1;
++------+------+------+------+
+| c1   | c2   | c1   | c3   |
++------+------+------+------+
+|    1 | a    | NULL | NULL |
+|    2 | b    | NULL | NULL |
+|    3 | c    |    3 | x    |
+| NULL | NULL |    4 | y    |
+| NULL | NULL |    5 | z    |
++------+------+------+------+
+
+------------------------------ SUB QUERY -------------------------------
+
+select * from t1 where c1 in(select c1 from t2); -- it is equivalent to intersect
+
+
+----------------------------- GROUP BY CLAUSE --------------------------
+
+
+----------------------------- HAVING CLAUSE ---------------------------
+To apply filter on aggregate columns
+
+
+
+------------------------------ WHERE VS HAVING -----------------------
+
+
+----------------------------- ORDER BY CLAUSE ------------------------
+
+
+----------------------------- COLUMN ALIAS & TABLE ALIAS ------------
+
+
+----------------------------- LIMIT AND OFFSET ------------------
+
+
+------------------------------ INLINE VIEWS ------------------------
+
+insert into t1(c1, c2, c3)
+values(5, 'e', current_date());
+
+
+select * from t1;
+
+
+
+a schema or database is same in MYSQL.
+
+1. revise slides from mySQl taining till slide no 35
+2. redo all the queries from day1commands
+3. read 3 times pdf on CODS Rule
+4. do 10 queries using emp and dept
+
+
+
+
+
+
+
+
+
+
+
+
+
